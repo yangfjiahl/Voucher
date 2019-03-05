@@ -1,10 +1,14 @@
 package com.mandou.voucher;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +18,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.sdk.app.PayTask;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -30,6 +35,7 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MSG_PAY_WECHAT = 3;
     private static final int MSG_PAY_ALIPAY = 4;
 
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
 
         @Override
@@ -86,11 +93,42 @@ public class MainActivity extends AppCompatActivity {
                     wechatPay(msg.getData());
                     break;
                 case MSG_PAY_ALIPAY:
-//                    alipay(msg.getData());
+                    alipay(msg);
                     break;
             }
         }
     };
+
+    /**
+     * do alipay req
+     *
+     * @param msg
+     */
+    private void alipay(Message msg){
+
+        @SuppressWarnings("unchecked")
+        PayResult payResult = new PayResult((Map<String, String>) msg.obj);
+
+
+        /**
+         对于支付结果，请商户依赖服务端的异步通知结果。同步通知结果，仅作为支付结束的通知。
+         */
+        String resultInfo = payResult.getResult();// 同步返回需要验证的信息
+        String resultStatus = payResult.getResultStatus();
+
+        // 判断resultStatus 为9000则代表支付成功
+        if (TextUtils.equals(resultStatus, "9000")) {
+
+            // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
+            Toast.makeText(getApplication(), "支付成功", Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+            Toast.makeText(getApplication(), "支付失败", Toast.LENGTH_SHORT).show();
+
+        }
+    }
 
     private void wechatPay(Bundle bundle) {
         JSONObject data = (JSONObject) bundle.getSerializable("data");
@@ -175,6 +213,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 初始化微信支付
+     *
+     * @param appId
+     */
     private void initWechatPay(String appId) {
         PayToolInfo.setWechatAppId(appId);
 
@@ -194,17 +237,63 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 初始化支付宝支付
+     *
+     * @param appId
+     */
     private void initAliPay(String appId) {
+
+        // 初始化aplipay
+
         Button button = findViewById(R.id.btn_pay_alipay);
         button.setVisibility(View.VISIBLE);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                sendAliPayRequest();
+                sendAliPayRequest();
             }
         });
     }
+
+
+    /**
+     * alipay req
+     */
+    public void sendAliPayRequest(){
+//        boolean rsa2 = (RSA2_PRIVATE.length() > 0);
+//        Map<String, String> params = OrderInfoUtil2_0.buildOrderParamMap(APPID, rsa2);
+//        String orderParam = OrderInfoUtil2_0.buildOrderParam(params);
+//
+//        String privateKey = rsa2 ? RSA2_PRIVATE : RSA_PRIVATE;
+//        String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
+//        final String orderInfo = orderParam + "&" + sign;
+
+        // OTDO:
+        final String orderInfo = "";
+
+        Runnable payRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                PayTask alipay = new PayTask(MainActivity.this);
+                Map<String, String> result = alipay.payV2(orderInfo, true);
+
+                Log.i(TAG, result.toString());
+
+                Message msg = new Message();
+                msg.what = MSG_PAY_ALIPAY;
+                msg.obj = result;
+                handler.sendMessage(msg);
+            }
+        };
+
+        Thread payThread = new Thread(payRunnable);
+        payThread.start();
+    }
+
+
 
     public void sendWechatPayRequest() {
         String amountStr = amount.getText().toString();
