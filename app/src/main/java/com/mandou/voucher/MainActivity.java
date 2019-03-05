@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private IWXAPI api;
 
-    private static final String APP_ID = "20190303002";
+    private static final String APP_ID = "20190303001";
     private static final String APP_SECRET = "123";
     private static final Headers headers;
 
