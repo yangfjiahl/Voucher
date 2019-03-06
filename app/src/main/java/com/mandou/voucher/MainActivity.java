@@ -1,10 +1,15 @@
 package com.mandou.voucher;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -14,12 +19,17 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.sdk.app.PayTask;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,13 +71,33 @@ public class MainActivity extends AppCompatActivity {
         goodsTitle = findViewById(R.id.title);
 
         TAG = getClass().getSimpleName();
+
+        requestPermission();
+    }
+
+    private static final int PERMISSIONS_REQUEST_CODE = 1002;
+    private void requestPermission() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.READ_PHONE_STATE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    }, PERMISSIONS_REQUEST_CODE);
+
+        }
     }
 
     private static final int MSG_SHOW_WECHAT = 1;
     private static final int MSG_SHOW_ALIPAY = 2;
 
-    private static final int MSG_PAY_WECHAT = 3;
-    private static final int MSG_PAY_ALIPAY = 4;
+    private static final int MSG_CREATE_ORDER_RESP = 3;
+
+    private static final int MSG_ALI_PAID = 4;
 
     private Handler handler = new Handler() {
 
@@ -82,18 +112,70 @@ public class MainActivity extends AppCompatActivity {
                 case MSG_SHOW_ALIPAY:
                     initAliPay(appId);
                     break;
-                case MSG_PAY_WECHAT:
-                    wechatPay(msg.getData());
+                case MSG_CREATE_ORDER_RESP:
+                    callPay(msg.getData());
                     break;
-                case MSG_PAY_ALIPAY:
-//                    alipay(msg.getData());
+                case MSG_ALI_PAID:
+                    Log.d(TAG, "pay result: " + msg.obj);
                     break;
             }
         }
     };
 
-    private void wechatPay(Bundle bundle) {
+    private void callPay(Bundle bundle) {
         JSONObject data = (JSONObject) bundle.getSerializable("data");
+
+        if ("WECHAT".equalsIgnoreCase(data.getString("payChannel"))) {
+            callWechatPay(data);
+        } else {
+            callAlipay(data);
+        }
+    }
+
+    private void callAlipay(JSONObject data) {
+        String sign = data.getString("sign");
+        data.remove("sign");
+        data.remove("payChannel");
+//        data.remove("format");
+
+        StringBuffer sb = new StringBuffer();
+        for(String k: data.keySet()) {
+            sb.append(k);
+            sb.append('=');
+            try {
+                sb.append(URLEncoder.encode(data.getString(k), "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            sb.append('&');
+        }
+
+        try {
+            sb.append("sign=").append(URLEncoder.encode(sign, "utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        final String orderInfo = sb.toString();
+
+        Log.d(TAG, orderInfo);
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                PayTask alipay = new PayTask(MainActivity.this);
+                Map<String, String> result = alipay.payV2(orderInfo, true);
+
+                Message msg = new Message();
+                msg.what = MSG_ALI_PAID;
+                msg.obj = result;
+                handler.sendMessage(msg);
+            }
+        }).start();
+    }
+
+    private void callWechatPay(JSONObject data) {
         // {appid=wx7f229e38a04f2bec, noncestr=LXyHXBUVh39LYBrK, package=Sign=WXPay, partnerid=1523808161, prepayid=wx2613502950188989bf5937ec1163319167, sign=50F044924686609080E94B7C6EB7969E, timestamp=1551160229}
         PayReq req = new PayReq();
         req.appId = data.getString("appid");
@@ -109,7 +191,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, req.checkArgs() + " 检查结果");
         boolean v = api.sendReq(req);
         Log.d(TAG, v + " 启动结果");
-
     }
 
     private void initPayTools() {
@@ -189,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendWechatPayRequest();
+                sendPayRequest("WECHAT");
             }
         });
     }
@@ -201,12 +282,12 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                sendAliPayRequest();
+                sendPayRequest("ALIPAY");
             }
         });
     }
 
-    public void sendWechatPayRequest() {
+    private void sendPayRequest(final String payChannel) {
         String amountStr = amount.getText().toString();
         String bizNoStr = bizNo.getText().toString();
         String titleStr = goodsTitle.getText().toString();
@@ -220,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
         params.put("amount", new BigDecimal(amountStr).multiply(new BigDecimal(100)).longValue());
         params.put("bizNo", bizNoStr);
         params.put("goodsTitle", titleStr);
-        params.put("payChannel", "WECHAT");
+        params.put("payChannel", payChannel);
 
         Request request = new Request.Builder()
                 .url(Api.buildUrl(Api.CREATE_ORDER))
@@ -247,13 +328,14 @@ public class MainActivity extends AppCompatActivity {
                 String code = result.getString("code");
 
                 JSONObject data = result.getJSONObject("data");
+                data.put("payChannel", payChannel);
 
                 if ("0".equals(code)) {
                     Message msg = new Message();
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("data", data);
                     msg.setData(bundle);
-                    msg.what = MSG_PAY_WECHAT;
+                    msg.what = MSG_CREATE_ORDER_RESP;
                     handler.sendMessage(msg);
                 } else {
                     Looper.prepare();
