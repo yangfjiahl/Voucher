@@ -9,7 +9,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alipay.sdk.app.PayTask;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -27,9 +25,7 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -165,13 +161,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                PayTask alipay = new PayTask(MainActivity.this);
-                Map<String, String> result = alipay.payV2(orderInfo, true);
-
-                Message msg = new Message();
-                msg.what = MSG_ALI_PAID;
-                msg.obj = result;
-                handler.sendMessage(msg);
+//                PayTask alipay = new PayTask(MainActivity.this);
+//                Map<String, String> result = alipay.payV2(orderInfo, true);
+//
+//                Message msg = new Message();
+//                msg.what = MSG_ALI_PAID;
+//                msg.obj = result;
+//                handler.sendMessage(msg);
             }
         }).start();
     }
@@ -265,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
     private void initWechatPay(String appId) {
         PayToolInfo.setWechatAppId(appId);
 
-        api = WXAPIFactory.createWXAPI(getApplicationContext(), appId, false);
+        api = WXAPIFactory.createWXAPI(this, appId);
 
         boolean v =  api.registerApp(appId);
         Log.d(TAG, v + " 注册结果");
