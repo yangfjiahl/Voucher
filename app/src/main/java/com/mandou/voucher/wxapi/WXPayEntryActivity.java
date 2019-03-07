@@ -1,10 +1,12 @@
-package com.mandou.voucher;
+package com.mandou.voucher.wxapi;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.mandou.voucher.PayToolInfo;
+import com.mandou.voucher.R;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
@@ -26,8 +28,12 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pay_result);
 
+        Log.d(TAG, "appId=" + PayToolInfo.getWechatAppId());
+
         api = WXAPIFactory.createWXAPI(this, PayToolInfo.getWechatAppId());
         api.handleIntent(getIntent(), this);
+
+        Log.d(TAG, "pay create");
     }
 
     @Override
@@ -35,15 +41,18 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         super.onNewIntent(intent);
         setIntent(intent);
         api.handleIntent(intent, this);
+
+        Log.d(TAG, "pay back new intent");
     }
 
     @Override
     public void onReq(BaseReq req) {
+        Log.d(TAG, "request ");
     }
 
     @Override
     public void onResp(BaseResp resp) {
-        Log.d(TAG, "onPayFinish, errCode = " + resp.errCode);
+        Log.d(TAG, "onPayFinish, errCode = " + resp.errStr + " type=" + resp.getType() + " transaction=" + resp.transaction);
 
         if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
 

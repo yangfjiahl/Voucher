@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private IWXAPI api;
 
-    private static final String APP_ID = "20190303001";
+    private static final String APP_ID = "20190307001";
     private static final String APP_SECRET = "123";
     private static final Headers headers;
 
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
     private void initWechatPay(String appId) {
         PayToolInfo.setWechatAppId(appId);
 
-        api = WXAPIFactory.createWXAPI(getApplicationContext(), null);
+        api = WXAPIFactory.createWXAPI(getApplicationContext(), appId, false);
 
         boolean v =  api.registerApp(appId);
         Log.d(TAG, v + " 注册结果");
