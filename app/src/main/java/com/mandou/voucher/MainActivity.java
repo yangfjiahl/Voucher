@@ -263,9 +263,6 @@ public class MainActivity extends AppCompatActivity {
 
         api = WXAPIFactory.createWXAPI(this, appId);
 
-        boolean v =  api.registerApp(appId);
-        Log.d(TAG, v + " 注册结果");
-
         Button button = findViewById(R.id.btn_pay_wechat);
         button.setVisibility(View.VISIBLE);
 
