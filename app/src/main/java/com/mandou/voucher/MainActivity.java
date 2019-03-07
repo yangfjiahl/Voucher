@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.sdk.app.PayTask;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -161,13 +162,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-//                PayTask alipay = new PayTask(MainActivity.this);
-//                Map<String, String> result = alipay.payV2(orderInfo, true);
-//
-//                Message msg = new Message();
-//                msg.what = MSG_ALI_PAID;
-//                msg.obj = result;
-//                handler.sendMessage(msg);
+                PayTask alipay = new PayTask(MainActivity.this);
+                Map<String, String> result = alipay.payV2(orderInfo, true);
+
+                Message msg = new Message();
+                msg.what = MSG_ALI_PAID;
+                msg.obj = result;
+                handler.sendMessage(msg);
             }
         }).start();
     }
