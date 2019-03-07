@@ -25,7 +25,7 @@
         </activity>
 
         <activity
-            android:name="com.mandou.voucher.wxapi.WXPayEntryActivity"
+            android:name=".wxapi.WXPayEntryActivity"
             android:exported="true"
             android:launchMode="singleTop"/>
     </application>
