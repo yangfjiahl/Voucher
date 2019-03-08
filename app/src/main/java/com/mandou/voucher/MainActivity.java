@@ -1,6 +1,7 @@
 package com.mandou.voucher;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +33,6 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -41,17 +41,9 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private IWXAPI api;
-
-    private static final String APP_ID = "20190307001";
-    private static final String APP_SECRET = "123";
-    private static final Headers headers;
-
     private static String TAG;
 
-    static {
-        headers = Headers.of("APP_ID", APP_ID, "APP_SECRET", APP_SECRET);
-    }
+    private IWXAPI api;
 
     EditText amount;
     EditText bizNo;
@@ -114,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                     callPay(msg.getData());
                     break;
                 case MSG_ALI_PAID:
-                    Log.d(TAG, "pay result: " + msg.obj);
+                    startActivity(new Intent(MainActivity.this, PayResultActivity.class));
                     break;
             }
         }
@@ -194,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     private void initPayTools() {
         Request request = new Request.Builder()
                 .url(Api.buildUrl(Api.GET_PAY_TOOLS))
-                .headers(headers)
+                .headers(PayToolInfo.headers)
                 .build();
 
         Log.d(TAG, request.headers().toString());
@@ -297,6 +289,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        PayToolInfo.setCurrentBizNo(bizNoStr);
+
         Map<String, Object> params = new HashMap<>();
         params.put("amount", new BigDecimal(amountStr).multiply(new BigDecimal(100)).longValue());
         params.put("bizNo", bizNoStr);
@@ -306,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url(Api.buildUrl(Api.CREATE_ORDER))
                 .post(RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), JSONObject.toJSONString(params)))
-                .headers(headers)
+                .headers(PayToolInfo.headers)
                 .build();
         Call call = Api.getClient().newCall(request);
         call.enqueue(new Callback() {
@@ -327,10 +321,10 @@ public class MainActivity extends AppCompatActivity {
 
                 String code = result.getString("code");
 
-                JSONObject data = result.getJSONObject("data");
-                data.put("payChannel", payChannel);
-
                 if ("0".equals(code)) {
+                    JSONObject data = result.getJSONObject("data");
+                    data.put("payChannel", payChannel);
+
                     Message msg = new Message();
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("data", data);
@@ -339,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
                     handler.sendMessage(msg);
                 } else {
                     Looper.prepare();
-                    Toast.makeText(MainActivity.this, "服务端故障，请联系客服", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, result.getString("msg"), Toast.LENGTH_LONG).show();
                     Looper.loop();
                 }
             }

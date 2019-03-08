@@ -17,6 +17,8 @@ public class Api {
 
     public static final String CREATE_ORDER = "/order.json";
 
+    public static final String QUERY_ORDER = "/detail.json";
+
     public static OkHttpClient getClient() {
         return CLIENT;
     }

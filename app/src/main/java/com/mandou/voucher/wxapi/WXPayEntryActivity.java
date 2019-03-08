@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.mandou.voucher.MainActivity;
+import com.mandou.voucher.PayResult;
+import com.mandou.voucher.PayResultActivity;
 import com.mandou.voucher.PayToolInfo;
 import com.mandou.voucher.R;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
@@ -42,7 +45,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
         setIntent(intent);
         api.handleIntent(intent, this);
 
-        Log.d(TAG, "pay back new intent");
+        Log.d(TAG, "pay new intent");
     }
 
     @Override
@@ -54,8 +57,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
     public void onResp(BaseResp resp) {
         Log.d(TAG, "onPayFinish, errCode = " + resp.errStr + " type=" + resp.getType() + " transaction=" + resp.transaction);
 
-        if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
-
-        }
+        startActivity(new Intent(this, PayResultActivity.class));
+        finish();
     }
 }

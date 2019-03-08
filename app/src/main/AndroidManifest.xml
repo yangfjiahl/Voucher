@@ -24,12 +24,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="wxe1271c6819741934"/>
-            </intent-filter>
         </activity>
 
         <activity
@@ -37,6 +31,7 @@
             android:exported="true"
             android:launchMode="singleTop"/>
 
+        <activity android:name=".PayResultActivity" />
     </application>
 
 </manifest>
