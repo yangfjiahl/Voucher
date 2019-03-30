@@ -33,6 +33,8 @@
             android:launchMode="singleTop"/>
 
         <activity android:name=".PayResultActivity" />
+
+        <activity android:name=".LoginActivity" />
     </application>
 
 </manifest>
