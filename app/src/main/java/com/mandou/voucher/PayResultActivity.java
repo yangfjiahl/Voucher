@@ -18,9 +18,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -61,7 +59,7 @@ public class PayResultActivity extends Activity {
     }
 
     private void displayPayResult() {
-        HttpUrl.Builder urlBuilder =HttpUrl.parse(Api.buildUrl(Api.QUERY_ORDER))
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(Api.buildUrl(Api.QUERY_ORDER))
                 .newBuilder();
         urlBuilder.addQueryParameter("bizNo", PayToolInfo.getCurrentBizNo());
 

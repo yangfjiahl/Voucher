@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20px">
+
+    <TextView
+        android:id="@+id/tip"
+        android:textSize="18pt"
+        android:textAlignment="center"
+        android:text="Account login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:id="@+id/mobileLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20pt">
+
+        <TextView
+            android:text="mobileNo: "
+            android:textSize="12pt"
+            android:layout_width="0px"
+            android:layout_weight="4"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:textSize="12pt"
+            android:inputType="number"
+            android:id="@+id/mobileNo"
+            android:layout_width="0px"
+            android:layout_weight="6"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/codeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10pt">
+
+        <TextView
+            android:text="smsCode: "
+            android:textSize="12pt"
+            android:layout_width="0px"
+            android:layout_weight="4"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:textSize="12pt"
+            android:inputType="number"
+            android:id="@+id/smsCode"
+            android:layout_width="0px"
+            android:layout_weight="3"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_smsCode"
+            android:layout_width="0px"
+            android:layout_weight="3"
+            android:text="SMS CODE"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:background="#ff0000"
+        android:layout_marginTop="20pt"
+        android:text="Submit" />
+
+</LinearLayout>

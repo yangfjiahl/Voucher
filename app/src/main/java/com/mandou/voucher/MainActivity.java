@@ -3,13 +3,13 @@ package com.mandou.voucher;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +42,8 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static String TAG;
+
+    private static final String TOKEN = "TOKEN";
 
     private IWXAPI api;
 
@@ -280,12 +282,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendPayRequest(final String payChannel) {
+        // check user login
+        String tokenStr = PreferenceHelper.getValue(TOKEN);
+        if (tokenStr == null || tokenStr.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            return;
+        }
+
         String amountStr = amount.getText().toString();
         String bizNoStr = bizNo.getText().toString();
         String titleStr = goodsTitle.getText().toString();
 
         if (amountStr.length() == 0 || bizNoStr.length() == 0 || titleStr.length() == 0) {
-            Toast.makeText(MainActivity.this, "请输入金额、单号、标题", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Please input bizNo、amount and title", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -296,6 +306,10 @@ public class MainActivity extends AppCompatActivity {
         params.put("bizNo", bizNoStr);
         params.put("goodsTitle", titleStr);
         params.put("payChannel", payChannel);
+
+        if (tokenStr != null && !tokenStr.isEmpty()) {
+            params.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
+        }
 
         Request request = new Request.Builder()
                 .url(Api.buildUrl(Api.CREATE_ORDER))

@@ -20,6 +20,12 @@ public class Api {
 
     public static final String QUERY_ORDER = "/detail.json";
 
+    public static final String SMS = "/sms.json";
+
+    public static final String LOGIN = "/auth.json";
+
+    public static final String CHECK_LOGIN = "/checkAuth.json";
+
     public static OkHttpClient getClient() {
         return CLIENT;
     }

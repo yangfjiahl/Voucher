@@ -3,6 +3,8 @@
 *.ap_
 gradle*
 *.apk
+.project
+**/.settings/*
 
 # Files for the ART/Dalvik VM
 *.dex
