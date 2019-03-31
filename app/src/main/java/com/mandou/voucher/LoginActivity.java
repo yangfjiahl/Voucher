@@ -3,7 +3,6 @@ package com.mandou.voucher;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Looper;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
@@ -15,15 +14,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -42,8 +38,8 @@ public class LoginActivity extends Activity {
     Button bSubmit;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
 
@@ -116,13 +112,13 @@ public class LoginActivity extends Activity {
                     return;
                 }
 
-                Map<String, Object> params = new HashMap<>();
-                params.put("mobileNo", mobile);
-                params.put("authCode", authCode);
+                FormBody.Builder builder = new FormBody.Builder();
+                builder.add("mobileNo", mobile);
+                builder.add("authCode", authCode);
 
                 Request request = new Request.Builder()
                         .url(Api.buildUrl(Api.LOGIN))
-                        .post(RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), JSONObject.toJSONString(params)))
+                        .post(builder.build())
                         .headers(PayToolInfo.headers)
                         .build();
                 Call call = Api.getClient().newCall(request);

@@ -282,13 +282,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendPayRequest(final String payChannel) {
-        // check user login
-        String tokenStr = PreferenceHelper.getValue(TOKEN);
-        if (tokenStr == null || tokenStr.isEmpty()) {
-            Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            return;
-        }
 
         String amountStr = amount.getText().toString();
         String bizNoStr = bizNo.getText().toString();
@@ -296,6 +289,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (amountStr.length() == 0 || bizNoStr.length() == 0 || titleStr.length() == 0) {
             Toast.makeText(MainActivity.this, "Please input bizNo、amount and title", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // check user login
+        String tokenStr = PreferenceHelper.getValue(TOKEN);
+        if (tokenStr == null || tokenStr.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
+
+            try{
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
 

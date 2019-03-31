@@ -58,7 +58,7 @@ public class VoucherApp extends Application {
                 public void onResponse(Call call, Response response) throws IOException {
                     String s = response.body().string();
 
-                    Log.d(TAG, "has expired: " + s);
+                    Log.d(TAG, "onResponse: " + s);
 
                     JSONObject result = JSON.parseObject(s);
 
@@ -68,6 +68,8 @@ public class VoucherApp extends Application {
                     }
                 }
             });
+        } else {
+            Log.d(TAG, "No credential");
         }
     }
 }

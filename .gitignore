@@ -5,6 +5,7 @@ gradle*
 *.apk
 .project
 **/.settings/*
+output.json
 
 # Files for the ART/Dalvik VM
 *.dex
