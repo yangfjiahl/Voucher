@@ -294,16 +294,17 @@ public class MainActivity extends AppCompatActivity {
 
         // check user login
         String tokenStr = PreferenceHelper.getValue(TOKEN);
-        if (tokenStr == null || tokenStr.isEmpty()) {
-            Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
+        // ===========UNCOMMENT below lines, if you need authentication module=========
+        // if (tokenStr == null || tokenStr.isEmpty()) {
+        //     Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
 
-            try{
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-            return;
-        }
+        //     try{
+        //         startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        //     }catch (Exception e) {
+        //         e.printStackTrace();
+        //     }
+        //     return;
+        // }
 
         PayToolInfo.setCurrentBizNo(bizNoStr);
 
