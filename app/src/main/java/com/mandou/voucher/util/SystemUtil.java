@@ -21,13 +21,13 @@ import android.util.Log;
  */
 public class SystemUtil {
 
-    private String tag = SystemUtil.class.getSimpleName();
+    private static String tag = SystemUtil.class.getSimpleName();
 
     /**
      * 获取手机厂商名称
      * @return
      */
-    public String getDeviceBrand() {
+    public static String getDeviceBrand() {
         return Build.BRAND;
     }
 
@@ -35,7 +35,7 @@ public class SystemUtil {
      * 获取手机型号(设备类型 )
      * @return
      */
-    public String getDeviceModel() {
+    public static String getDeviceModel() {
         return Build.MODEL;
     }
 
@@ -43,7 +43,7 @@ public class SystemUtil {
      * 获取当前系统版本号
      * @return
      */
-    public String getSysVersion() {
+    public static String getSysVersion() {
         return Build.VERSION.RELEASE;
     }
 
@@ -52,27 +52,31 @@ public class SystemUtil {
      *
      * @return
      */
-    public String getDeviceId(Context context) {
+    public static String getDeviceId(Context context) {
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Activity.TELEPHONY_SERVICE);
         if (tm != null) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                return tm.getDeviceId();
+
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // TODO:
+
             }
+
+            return tm.getDeviceId();
         }
         return null;
     }
 
     /**
      * 获取经纬度
+     * <p>返回结果:第一个值为经度，第二个值为纬度</p>
      *
      * @param context
-     * @return
+     * @return Array
      */
-    public double[] getLongitude(Context context) {
+    public static double[] getLongitude(Context context) {
         double longitude = 0.0;
         double latitude = 0.0;
-
-        final int PERMISSIONS_REQUEST_CODE = 1002;
 
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         // 通GPS获取 经纬度
