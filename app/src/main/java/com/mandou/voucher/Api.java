@@ -26,6 +26,10 @@ public class Api {
 
     public static final String CHECK_LOGIN = "/checkAuth.json";
 
+    public static final String SESSION = "/session.json";
+
+    public static final String ACTION = "/action.json";
+
     public static OkHttpClient getClient() {
         return CLIENT;
     }
