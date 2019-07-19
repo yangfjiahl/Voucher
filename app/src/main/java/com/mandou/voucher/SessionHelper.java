@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 import com.mandou.voucher.util.NetworkUtil;
 import com.mandou.voucher.util.SystemUtil;
+import com.mandou.voucher.wxapi.ActionHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class SessionHelper {
 
     public static void init(Context context) {
         SessionHelper.context = context;
+        ActionHelper.init(context);
     }
 
     public static void startSession() {
@@ -40,6 +42,8 @@ public class SessionHelper {
         params.put("deviceFactory", SystemUtil.getDeviceBrand());
         params.put("osVersion", SystemUtil.getSysVersion());
         params.put("deviceId", SystemUtil.getDeviceId(context));
+        params.put("appStore", SystemUtil.getAppStore(context));
+        params.put("appVersion", SystemUtil.getVersionName(context));
         params.put("networkType", NetworkUtil.getNetworkType(context));
 
         double[] location = SystemUtil.getLongitude(context);

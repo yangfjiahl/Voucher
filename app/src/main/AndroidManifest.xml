@@ -35,6 +35,10 @@
         <activity android:name=".PayResultActivity" />
 
         <activity android:name=".LoginActivity" />
+
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="tencent" />
     </application>
 
 </manifest>

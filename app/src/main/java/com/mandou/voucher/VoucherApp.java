@@ -85,4 +85,5 @@ public class VoucherApp extends Application {
             Log.d(TAG, "No credential");
         }
     }
+
 }

@@ -39,7 +39,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static String TAG;
 
@@ -369,4 +369,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected boolean isPaymentPage() {
+        return true;
+    }
 }

@@ -25,7 +25,7 @@ import okhttp3.Response;
  * Created by calvin on 2019/3/8.
  */
 
-public class PayResultActivity extends Activity {
+public class PayResultActivity extends BaseActivity {
 
     private static final String TAG = "PayResultActivity";
 
