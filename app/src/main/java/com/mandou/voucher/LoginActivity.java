@@ -143,6 +143,7 @@ public class LoginActivity extends Activity {
                         if ("0".equals(code)) {
                             JSONObject data = result.getJSONObject("data");
                             PreferenceHelper.setValue(TOKEN, data.toJSONString());
+                            SessionHelper.startSession();
                             finish();
                         } else {
                             Looper.prepare();

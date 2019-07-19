@@ -1,8 +1,10 @@
 package com.mandou.voucher;
 
 import android.content.Context;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mandou.voucher.util.NetworkUtil;
 import com.mandou.voucher.util.SystemUtil;
@@ -18,38 +20,30 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * 用户session
- * created by Dell on 2019/7/13
- */
-public class Session {
-
+public class SessionHelper {
     private static String TAG = "Session";
-
     private static final String TOKEN = "TOKEN";
 
-    /**
-     * 保存session
-     * @param context
-     */
-    public void saveSession(Context context){
+    private static Context context;
 
-        Map<String,Object> params = new HashMap<>();
+    public static void init(Context context) {
+        SessionHelper.context = context;
+    }
+
+    public static void startSession() {
+        Map<String, Object> params = new HashMap<>();
 
         String tokenStr = PreferenceHelper.getValue(TOKEN);
-        if (tokenStr != null && !tokenStr.isEmpty()) {
-            params.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
-        }
+        params.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
 
-        params.put("deviceType", SystemUtil.getDeviceModel());
-        params.put("deviceFactory",SystemUtil.getDeviceBrand());
-        params.put("osVersion",SystemUtil.getSysVersion());
-        params.put("deviceId",SystemUtil.getDeviceId(context));
-        params.put("ipAddress",NetworkUtil.getIp(context));
-        params.put("networkType",NetworkUtil.getNetworkType(context));
+        params.put("deviceType", SystemUtil.getDeviceType());
+        params.put("deviceFactory", SystemUtil.getDeviceBrand());
+        params.put("osVersion", SystemUtil.getSysVersion());
+        params.put("deviceId", SystemUtil.getDeviceId(context));
+        params.put("networkType", NetworkUtil.getNetworkType(context));
 
         double[] location = SystemUtil.getLongitude(context);
-        if(location.length==2){
+        if (location.length == 2) {
             params.put("longitude", location[0]);
             params.put("latitude", location[1]);
         }
@@ -64,17 +58,17 @@ public class Session {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                Looper.prepare();
+                Toast.makeText(context, "请求服务端失败", Toast.LENGTH_LONG).show();
+                Looper.loop();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String s = response.body().toString();
-                JSONObject result = JSON.parseObject(s);
-
+                Log.d(TAG, "onResponse: " + s);
             }
         });
-
     }
 
 }

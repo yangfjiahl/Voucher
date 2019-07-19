@@ -35,8 +35,8 @@ public class SystemUtil {
      * 获取手机型号(设备类型 )
      * @return
      */
-    public static String getDeviceModel() {
-        return Build.MODEL;
+    public static String getDeviceType() {
+        return "ANDROID";
     }
 
     /**

@@ -14,24 +14,6 @@ import android.telephony.TelephonyManager;
 public class NetworkUtil {
 
     /**
-     * 网络是否连接
-     * @param context
-     * @return
-     */
-    public static boolean isNetworkConnected(Context context) {
-        if (context != null) {
-
-            ConnectivityManager mConnectivityManager = getConnManager(context);
-            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
-
-            if (mNetworkInfo != null) {
-                return mNetworkInfo.isAvailable();
-            }
-        }
-        return false;
-    }
-
-    /**
      * 当前网络连接类型
      *
      * <p>wifi | 4G|3G|2G</p>
@@ -43,7 +25,7 @@ public class NetworkUtil {
 
         String netType = "NONE";
 
-        if (context != null) {
+        if (context == null) {
             return netType;
         }
 
@@ -83,35 +65,10 @@ public class NetworkUtil {
                 // 2G网络 移动和联通的2G为GPRS或EGDE，电信的2G为CDMA
                 netType = "2G";
 
-            } else
-
-                netType = "NO DISPLAY";
+            }
         }
 
         return netType;
-    }
-
-    /**
-     * 获取IP地址
-     *
-     * @param context
-     * @return
-     */
-    public static String getIp(Context context){
-        //获取wifi服务
-        try {
-            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            //判断wifi是否开启
-            if (!wifiManager.isWifiEnabled()) {
-                wifiManager.setWifiEnabled(true);
-            }
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            return int2IP(wifiInfo.getIpAddress());
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return "";
     }
 
     /**
@@ -128,19 +85,5 @@ public class NetworkUtil {
             }
         }
         return  null;
-    }
-
-    /**
-     * ip 转换
-     * @param ipInt
-     * @return
-     */
-    private static String int2IP(int ipInt){
-        StringBuilder sb = new StringBuilder();
-        sb.append(ipInt & 0xFF).append(".");
-        sb.append((ipInt >> 8) & 0xFF).append(".");
-        sb.append((ipInt >> 16) & 0xFF).append(".");
-        sb.append((ipInt >> 24) & 0xFF);
-        return sb.toString();
     }
 }

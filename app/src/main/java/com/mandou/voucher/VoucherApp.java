@@ -5,13 +5,19 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mandou.voucher.util.NetworkUtil;
+import com.mandou.voucher.util.SystemUtil;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -31,8 +37,13 @@ public class VoucherApp extends Application {
         TAG = getClass().getSimpleName();
 
         PreferenceHelper.init(this);
+        SessionHelper.init(this);
 
         // API: check whether token is expired or not
+        checkLogin();
+    }
+
+    private void checkLogin() {
         String tokenStr = PreferenceHelper.getValue(TOKEN);
         if (tokenStr != null && !tokenStr.isEmpty()) {
             JSONObject json = JSONObject.parseObject(tokenStr);
@@ -65,6 +76,8 @@ public class VoucherApp extends Application {
                     if (!result.getBoolean("data")) {
                         // token expired, delete it
                         PreferenceHelper.remove(TOKEN);
+                    }  else {
+                        SessionHelper.startSession();
                     }
                 }
             });

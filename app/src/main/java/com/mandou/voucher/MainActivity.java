@@ -68,13 +68,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static final int PERMISSIONS_REQUEST_CODE = 1002;
+
     private void requestPermission() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED
-                ||ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 //        data.remove("format");
 
         StringBuffer sb = new StringBuffer();
-        for(String k: data.keySet()) {
+        for (String k : data.keySet()) {
             sb.append(k);
             sb.append('=');
             try {
@@ -302,16 +303,16 @@ public class MainActivity extends AppCompatActivity {
         // check user login
         String tokenStr = PreferenceHelper.getValue(TOKEN);
         // ===========UNCOMMENT below lines, if you need authentication module=========
-        // if (tokenStr == null || tokenStr.isEmpty()) {
-        //     Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
+        if (tokenStr == null || tokenStr.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Please login before payment", Toast.LENGTH_LONG).show();
 
-        //     try{
-        //         startActivity(new Intent(MainActivity.this, LoginActivity.class));
-        //     }catch (Exception e) {
-        //         e.printStackTrace();
-        //     }
-        //     return;
-        // }
+            try {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
 
         PayToolInfo.setCurrentBizNo(bizNoStr);
 
