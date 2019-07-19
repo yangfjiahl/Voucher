@@ -1,6 +1,8 @@
 package com.mandou.voucher;
 
+import android.app.Activity;
 import android.app.Application;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -41,6 +43,10 @@ public class VoucherApp extends Application {
 
         // API: check whether token is expired or not
         checkLogin();
+
+        // API:　Statistics　navigate pages
+        ActionHelper.init(this);
+        this.registerActivityLifecycleCallbacks(navigateAction());
     }
 
     private void checkLogin() {
@@ -86,4 +92,52 @@ public class VoucherApp extends Application {
         }
     }
 
+    /**
+     * 页面跳转监听统计
+     */
+    private static Application.ActivityLifecycleCallbacks navigateAction(){
+
+        Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                Log.v(TAG, activity.getClass().getName() + "onActivityCreated");
+                String className = activity.getClass().getName();
+                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面创建");
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {}
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                Log.v(TAG, activity.getClass().getName() + "onActivityResumed");
+                String className = activity.getClass().getName();
+                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面恢复");
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+                Log.v(TAG, activity.getClass().getName() + "onActivityDestroyed");
+                String className = activity.getClass().getName();
+                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面销毁");
+            }
+        };
+
+        return activityLifecycleCallbacks;
+    }
 }
