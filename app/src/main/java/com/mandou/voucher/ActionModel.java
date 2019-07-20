@@ -1,6 +1,7 @@
 package com.mandou.voucher;
 
 import java.util.Date;
+import java.util.Map;
 
 public class ActionModel {
 
@@ -10,11 +11,9 @@ public class ActionModel {
 
     private String eventName;
 
-    private String attachData;
-
-    private Date gmtOccur;
-
     private boolean isPaymentPage;
+
+    private Map<String, Object> attachData;
 
     public String getActionType() {
         return actionType;
@@ -40,27 +39,19 @@ public class ActionModel {
         this.eventName = eventName;
     }
 
-    public String getAttachData() {
-        return attachData;
-    }
-
-    public void setAttachData(String attachData) {
-        this.attachData = attachData;
-    }
-
-    public Date getGmtOccur() {
-        return gmtOccur;
-    }
-
-    public void setGmtOccur(Date gmtOccur) {
-        this.gmtOccur = gmtOccur;
-    }
-
     public boolean isPaymentPage() {
         return isPaymentPage;
     }
 
     public void setPaymentPage(boolean paymentPage) {
         isPaymentPage = paymentPage;
+    }
+
+    public void setAttachData(Map<String, Object> attachData) {
+        this.attachData = attachData;
+    }
+
+    public Map<String, Object> getAttachData() {
+        return attachData;
     }
 }

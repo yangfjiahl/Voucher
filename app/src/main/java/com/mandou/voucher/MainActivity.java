@@ -38,8 +38,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity implements HasPayment {
 
     private static String TAG;
 
@@ -51,6 +50,8 @@ public class MainActivity extends BaseActivity {
     EditText bizNo;
     EditText goodsTitle;
 
+    Button btnTap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +62,15 @@ public class MainActivity extends BaseActivity {
         amount = findViewById(R.id.amount);
         bizNo = findViewById(R.id.bizNo);
         goodsTitle = findViewById(R.id.title);
+        btnTap = findViewById(R.id.btn_tap);
+
+        btnTap.setOnClickListener(v -> {
+            ActionModel actionModel = new ActionModel();
+            actionModel.setActionType("TAP");
+            actionModel.setPageName(getClass().getSimpleName());
+            actionModel.setEventName("btn_click");
+            ActionHelper.reportAction(actionModel);
+        });
 
         TAG = getClass().getSimpleName();
 
@@ -370,7 +380,7 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected boolean isPaymentPage() {
+    public boolean isPaymentPage() {
         return true;
     }
 }

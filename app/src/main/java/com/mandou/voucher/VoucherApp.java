@@ -11,6 +11,7 @@ import com.mandou.voucher.util.NetworkUtil;
 import com.mandou.voucher.util.SystemUtil;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,14 +96,12 @@ public class VoucherApp extends Application {
     /**
      * 页面跳转监听统计
      */
-    private static Application.ActivityLifecycleCallbacks navigateAction(){
+    private static Application.ActivityLifecycleCallbacks navigateAction() {
 
         Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-                Log.v(TAG, activity.getClass().getName() + "onActivityCreated");
-                String className = activity.getClass().getName();
-                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面创建");
+
             }
 
             @Override
@@ -111,8 +110,15 @@ public class VoucherApp extends Application {
             @Override
             public void onActivityResumed(Activity activity) {
                 Log.v(TAG, activity.getClass().getName() + "onActivityResumed");
-                String className = activity.getClass().getName();
-                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面恢复");
+
+                ActionModel actionModel = new ActionModel();
+                actionModel.setPageName(activity.getClass().getSimpleName());
+
+                if (activity instanceof HasPayment) {
+                    actionModel.setPaymentPage(((HasPayment) activity).isPaymentPage());
+                }
+
+                ActionHelper.reportAction(actionModel);
             }
 
             @Override
@@ -132,9 +138,7 @@ public class VoucherApp extends Application {
 
             @Override
             public void onActivityDestroyed(Activity activity) {
-                Log.v(TAG, activity.getClass().getName() + "onActivityDestroyed");
-                String className = activity.getClass().getName();
-                ActionHelper.startAction(ActionHelper.ACTION_TYPE_NAVIGATE,className,"页面销毁");
+
             }
         };
 

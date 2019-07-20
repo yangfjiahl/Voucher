@@ -26,7 +26,7 @@ import okhttp3.Response;
  * Created by calvin on 2019/3/30.
  */
 
-public class LoginActivity extends BaseActivity {
+public class LoginActivity extends Activity {
 
     private static String TAG;
 

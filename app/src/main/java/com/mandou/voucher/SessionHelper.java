@@ -8,7 +8,6 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 import com.mandou.voucher.util.NetworkUtil;
 import com.mandou.voucher.util.SystemUtil;
-import com.mandou.voucher.wxapi.ActionHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
