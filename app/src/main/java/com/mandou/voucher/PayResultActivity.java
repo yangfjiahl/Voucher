@@ -25,7 +25,7 @@ import okhttp3.Response;
  * Created by calvin on 2019/3/8.
  */
 
-public class PayResultActivity extends Activity {
+public class PayResultActivity extends BaseActivity {
 
     private static final String TAG = "PayResultActivity";
 
@@ -41,6 +41,8 @@ public class PayResultActivity extends Activity {
             if ("0".equals(code)) {
                 JSONObject data = result.getJSONObject("data");
                 resultTxt.setText(String.format("your pay result:  payChannel: %s, paymentStatus: %s", data.getString("payChannel"), data.getString("paymentStatus")));
+
+                reportTapEvent("PAY:paid");
             } else {
                 Toast.makeText(PayResultActivity.this, result.getString("msg"), Toast.LENGTH_LONG).show();
             }

@@ -38,7 +38,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements HasPayment {
+public class MainActivity extends BaseActivity {
 
     private static String TAG;
 
@@ -65,11 +65,7 @@ public class MainActivity extends AppCompatActivity implements HasPayment {
         btnTap = findViewById(R.id.btn_tap);
 
         btnTap.setOnClickListener(v -> {
-            ActionModel actionModel = new ActionModel();
-            actionModel.setActionType("TAP");
-            actionModel.setPageName(getClass().getSimpleName());
-            actionModel.setEventName("btn_click");
-            ActionHelper.reportAction(actionModel);
+            reportTapEvent("btn_click");
         });
 
         TAG = getClass().getSimpleName();
@@ -323,6 +319,10 @@ public class MainActivity extends AppCompatActivity implements HasPayment {
             }
             return;
         }
+
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("payChannel", payChannel);
+        reportTapEvent("payment", extra);
 
         PayToolInfo.setCurrentBizNo(bizNoStr);
 
