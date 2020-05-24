@@ -14,8 +14,8 @@ android {
         applicationId "com.mandou.voucher"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -39,6 +39,9 @@ android {
                 }
             }
     }
+    configurations.all {
+        resolutionStrategy.force "com.android.support:support-v4:27.1.1"
+    }
 }
 
 dependencies {
@@ -51,6 +54,8 @@ dependencies {
 
     //alipay sdk
     compile (name: 'alipaySdk-15.6.0-20190226104053', ext: 'aar')
+
+    compile project(":acs")
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

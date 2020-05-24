@@ -1,4 +1,4 @@
-package com.mandou.voucher.util;
+package com.itech.acs.sdk;
 
 import android.Manifest;
 import android.app.Activity;
@@ -74,8 +74,7 @@ public class SystemUtil {
         } catch (Exception e) {
 
         }
-
-        return null;
+        return "unknown";
     }
 
     /**
@@ -100,11 +99,14 @@ public class SystemUtil {
 
                 }
 
+                try {
+                    Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (location != null) {
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    }
+                } catch (Exception e) {
 
-                Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                if (location != null) {
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
                 }
 
             } else {
@@ -158,6 +160,7 @@ public class SystemUtil {
                     PackageManager.GET_META_DATA);
             value = appInfo.metaData.getString("UMENG_CHANNEL");
         } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
         return value;
     }
@@ -172,6 +175,7 @@ public class SystemUtil {
             //返回版本号
             return packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
 
         return null;

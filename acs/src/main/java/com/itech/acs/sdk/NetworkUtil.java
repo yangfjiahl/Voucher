@@ -1,10 +1,8 @@
-package com.mandou.voucher.util;
+package com.itech.acs.sdk;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 
 /**

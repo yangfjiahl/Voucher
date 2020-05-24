@@ -172,7 +172,7 @@ public class MainActivity extends BaseActivity {
             public void run() {
                 PayTask alipay = new PayTask(MainActivity.this);
                 Map<String, String> result = alipay.payV2(orderInfo, true);
-
+                Log.d(TAG, "支付宝支付结果:" + result);
                 Message msg = new Message();
                 msg.what = MSG_ALI_PAID;
                 msg.obj = result;

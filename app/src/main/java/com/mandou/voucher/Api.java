@@ -10,8 +10,8 @@ public class Api {
 
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
-//    private static final String BASE_URL = "http://cashier.51mandou.com";
-    private static final String BASE_URL = "http://192.168.1.37:8080/cashier-web";
+    private static final String BASE_URL = "http://cashier.51mandou.com";
+//    private static final String BASE_URL = "http://192.168.1.5:8080/cashier-web";
 //    private static final String BASE_URL = "https://api.appinchinaservices.com";
 
     public static final String GET_PAY_TOOLS = "/payTools.json";

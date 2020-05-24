@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.itech.acs.sdk.AcsClient;
+import com.itech.acs.sdk.AcsClientConfig;
 import com.mandou.voucher.util.NetworkUtil;
 import com.mandou.voucher.util.SystemUtil;
 
@@ -46,8 +48,12 @@ public class VoucherApp extends Application {
         checkLogin();
 
         // API:　Statistics　navigate pages
-        ActionHelper.init(this);
-        this.registerActivityLifecycleCallbacks(navigateAction());
+//        ActionHelper.init(this);
+//        this.registerActivityLifecycleCallbacks(navigateAction());
+
+        // Statistics SDK:
+        AcsClient.sharedInstance().init(this, new AcsClientConfig("20190307001", "123"))
+                .setLoggingEnabled();
     }
 
     private void checkLogin() {
@@ -83,7 +89,7 @@ public class VoucherApp extends Application {
                     if (!result.getBoolean("data")) {
                         // token expired, delete it
                         PreferenceHelper.remove(TOKEN);
-                    }  else {
+                    } else {
                         SessionHelper.startSession();
                     }
                 }
@@ -105,7 +111,8 @@ public class VoucherApp extends Application {
             }
 
             @Override
-            public void onActivityStarted(Activity activity) {}
+            public void onActivityStarted(Activity activity) {
+            }
 
             @Override
             public void onActivityResumed(Activity activity) {

@@ -6,6 +6,7 @@ gradle*
 .project
 **/.settings/*
 output.json
+.DS_Store
 
 # Files for the ART/Dalvik VM
 *.dex
