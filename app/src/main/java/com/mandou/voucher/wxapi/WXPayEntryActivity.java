@@ -5,12 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.mandou.voucher.MainActivity;
-import com.mandou.voucher.PayResult;
 import com.mandou.voucher.PayResultActivity;
 import com.mandou.voucher.PayToolInfo;
 import com.mandou.voucher.R;
-import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.openapi.IWXAPI;

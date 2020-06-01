@@ -1,9 +1,9 @@
 package com.mandou.voucher;
 
 
-import java.util.Map;
-
 import android.text.TextUtils;
+
+import java.util.Map;
 
 public class PayResult {
     private String resultStatus;

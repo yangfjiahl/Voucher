@@ -7,22 +7,15 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.itech.acs.sdk.AcsClient;
-import com.itech.acs.sdk.AcsClientConfig;
-import com.mandou.voucher.util.NetworkUtil;
-import com.mandou.voucher.util.SystemUtil;
+import com.mandou.acs.sdk.AcsClient;
+import com.mandou.acs.sdk.AcsClientConfig;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**

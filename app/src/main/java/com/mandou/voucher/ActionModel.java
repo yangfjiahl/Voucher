@@ -1,6 +1,5 @@
 package com.mandou.voucher;
 
-import java.util.Date;
 import java.util.Map;
 
 public class ActionModel {
