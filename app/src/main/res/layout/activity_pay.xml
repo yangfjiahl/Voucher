@@ -89,19 +89,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/btn_paysdk"
-        android:text="SDK PAYMENT"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/btn_tap" />
+        app:layout_constraintBottom_toTopOf="@id/code"
+        >
+        <EditText
+            android:id="@+id/mobileText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"/>
+        <Button
+            android:id="@+id/smsBtn"
+            android:text="SMS"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_tap"
-        android:text="TAP EVENT"
+    <LinearLayout
+        android:id="@+id/code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/btn_pay_wechat" />
+        app:layout_constraintBottom_toTopOf="@id/btn_pay_wechat"
+        >
+        <EditText
+            android:id="@+id/codeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"/>
+        <Button
+            android:id="@+id/loginBtn"
+            android:text="LOGIN"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btn_pay_alipay"

@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mandou.acp.sdk.AcpClient;
+import com.mandou.acp.sdk.AcpClientConfig;
 import com.mandou.acs.sdk.AcsClient;
 import com.mandou.acs.sdk.AcsClientConfig;
 
@@ -47,6 +49,8 @@ public class VoucherApp extends Application {
         // Statistics SDK:
         AcsClient.sharedInstance().init(this, new AcsClientConfig("20190307001", "123"))
                 .setLoggingEnabled();
+
+        AcpClient.sharedInstance().init(this, new AcpClientConfig("20190307001", "123"));
     }
 
     private void checkLogin() {

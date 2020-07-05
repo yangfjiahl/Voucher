@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
     EditText goodsTitle;
 
     Button btnTap;
+    Button btnSdkPay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +63,12 @@ public class MainActivity extends BaseActivity {
         bizNo = findViewById(R.id.bizNo);
         goodsTitle = findViewById(R.id.title);
         btnTap = findViewById(R.id.btn_tap);
+        btnSdkPay = findViewById(R.id.btn_paysdk);
 
-        btnTap.setOnClickListener(v -> {
-            reportTapEvent("btn_click");
-        });
+        btnTap.setOnClickListener(v -> reportTapEvent("btn_click"));
+
+        btnSdkPay.setOnClickListener(v -> startActivity(
+                new Intent(MainActivity.this, PayActivity.class)));
 
         TAG = getClass().getSimpleName();
 
@@ -84,7 +87,7 @@ public class MainActivity extends BaseActivity {
                 != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
-                ) {
+        ) {
 
             ActivityCompat.requestPermissions(this,
                     new String[]{
