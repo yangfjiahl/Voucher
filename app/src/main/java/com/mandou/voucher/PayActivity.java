@@ -15,11 +15,13 @@ import com.mandou.acp.sdk.AcpClient;
 import com.mandou.acp.sdk.AuthCallback;
 import com.mandou.acp.sdk.ErrorHandler;
 import com.mandou.acp.sdk.PayOrder;
+import com.mandou.acp.sdk.PayOrderCallback;
 import com.mandou.acp.sdk.PayOrderInfo;
 import com.mandou.acp.sdk.PayToolCallback;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +69,8 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
         initSms();
         initCode();
+
+        queryHistory();
     }
 
     // ======================支付相关
@@ -128,10 +132,25 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
     // ====================支付相关
 
     // ====================登录相关
+    private void checkAuth() {
+        AcpClient.sharedInstance().checkAuth("{'token':'123'}", new AuthCallback() {
+            @Override
+            public void onResult(boolean b, Map<String, String> map) {
+
+            }
+
+            @Override
+            public void onFail(String s, Throwable throwable) {
+
+            }
+        });
+    }
+
     Button smsBtn;
     EditText mobileNo;
 
     private void initSms() {
+        checkAuth();
         smsBtn = findViewById(R.id.smsBtn);
         mobileNo = findViewById(R.id.mobileText);
 
@@ -144,7 +163,7 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
             AcpClient.sharedInstance().sendSms(mobileNoStr, new AuthCallback() {
                 @Override
-                public void onResult(boolean b) {
+                public void onResult(boolean b, Map<String, String> data) {
 
                 }
 
@@ -174,7 +193,7 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
             AcpClient.sharedInstance().checkSmsCode(mobileNoStr, codeStr, new AuthCallback() {
                 @Override
-                public void onResult(boolean b) {
+                public void onResult(boolean b, Map<String, String> data) {
 
                 }
 
@@ -183,6 +202,33 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
                 }
             });
+        });
+    }
+
+    // ======================历史订单相关
+    private void queryHistory() {
+        AcpClient.sharedInstance().queryHistoryOrder("20190401000082726316100012", "PAID", 1, 10, new PayOrderCallback() {
+            @Override
+            public void onSuccess(List<PayOrderInfo> list) {
+
+            }
+
+            @Override
+            public void onFail(String s, Throwable throwable) {
+
+            }
+        });
+
+        AcpClient.sharedInstance().querySingleOrder("20190401000082726316100012", "dhshehx", new PayOrderCallback() {
+            @Override
+            public void onSuccess(List<PayOrderInfo> list) {
+
+            }
+
+            @Override
+            public void onFail(String s, Throwable throwable) {
+
+            }
         });
     }
 }
