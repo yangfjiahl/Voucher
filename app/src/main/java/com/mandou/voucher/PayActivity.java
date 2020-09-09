@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mandou.acp.sdk.AcpClient;
 import com.mandou.acp.sdk.AuthCallback;
 import com.mandou.acp.sdk.ErrorHandler;
@@ -34,6 +36,7 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
     EditText amount;
     EditText bizNo;
+    EditText serviceNo;
     EditText goodsTitle;
 
     @Override
@@ -65,6 +68,7 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
 
         amount = findViewById(R.id.amount);
         bizNo = findViewById(R.id.bizNo);
+        serviceNo = findViewById(R.id.serviceNo);
         goodsTitle = findViewById(R.id.title);
 
         initSms();
@@ -90,9 +94,12 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
         });
     }
 
+    private static final String TOKEN = "TOKEN";
+
     private PayOrder buildPayOrder(String payChannel) {
         String amountStr = amount.getText().toString();
         String bizNoStr = bizNo.getText().toString();
+        String serviceNoStr = serviceNo.getText().toString();
         String titleStr = goodsTitle.getText().toString();
 
         if (amountStr.length() == 0 || bizNoStr.length() == 0 || titleStr.length() == 0) {
@@ -103,7 +110,13 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
         PayOrder payOrder = PayOrder.payWith(payChannel);
         payOrder.setAmount(new BigDecimal(amountStr).multiply(new BigDecimal(100)).longValue());
         payOrder.setBizNo(bizNoStr);
+        payOrder.setServiceNo(serviceNoStr);
         payOrder.setGoodsTitle(titleStr);
+
+        String tokenStr = PreferenceHelper.getValue(TOKEN);
+        if (tokenStr != null && !tokenStr.isEmpty()) {
+            payOrder.setCustomerIdentity(JSONObject.parseObject(tokenStr).getString("customerId"));
+        }
 
         return payOrder;
     }
@@ -118,7 +131,9 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
             @Override
             public void onClick(View v) {
                 PayOrder payOrder = buildPayOrder("ALIPAY");
-
+                if (payOrder == null) {
+                    return;
+                }
                 AcpClient.sharedInstance().startPayment(PayActivity.this, payOrder, PayResultActivity.class, PayActivity.this);
             }
         });
@@ -194,7 +209,7 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
             AcpClient.sharedInstance().checkSmsCode(mobileNoStr, codeStr, new AuthCallback() {
                 @Override
                 public void onResult(boolean b, Map<String, String> data) {
-
+                    PreferenceHelper.setValue(TOKEN, JSON.toJSONString(data));
                 }
 
                 @Override

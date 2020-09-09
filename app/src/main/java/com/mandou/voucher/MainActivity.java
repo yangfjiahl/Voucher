@@ -47,6 +47,7 @@ public class MainActivity extends BaseActivity {
 
     EditText amount;
     EditText bizNo;
+    EditText serviceNo;
     EditText goodsTitle;
 
     Button btnTap;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity {
 
         amount = findViewById(R.id.amount);
         bizNo = findViewById(R.id.bizNo);
+        serviceNo = findViewById(R.id.serviceNo);
         goodsTitle = findViewById(R.id.title);
         btnTap = findViewById(R.id.btn_tap);
         btnSdkPay = findViewById(R.id.btn_paysdk);
@@ -301,6 +303,7 @@ public class MainActivity extends BaseActivity {
 
         String amountStr = amount.getText().toString();
         String bizNoStr = bizNo.getText().toString();
+        String serviceNoStr = serviceNo.getText().toString();
         String titleStr = goodsTitle.getText().toString();
 
         if (amountStr.length() == 0 || bizNoStr.length() == 0 || titleStr.length() == 0) {
@@ -333,6 +336,7 @@ public class MainActivity extends BaseActivity {
         params.put("bizNo", bizNoStr);
         params.put("goodsTitle", titleStr);
         params.put("payChannel", payChannel);
+        params.put("serviceNo", serviceNoStr);
 
         if (tokenStr != null && !tokenStr.isEmpty()) {
             params.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
