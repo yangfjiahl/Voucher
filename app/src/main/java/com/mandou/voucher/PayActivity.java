@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -16,12 +17,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.mandou.acp.sdk.AcpClient;
 import com.mandou.acp.sdk.AuthCallback;
 import com.mandou.acp.sdk.ErrorHandler;
+import com.mandou.acp.sdk.ExpireTimeCallback;
 import com.mandou.acp.sdk.PayOrder;
 import com.mandou.acp.sdk.PayOrderCallback;
 import com.mandou.acp.sdk.PayOrderInfo;
 import com.mandou.acp.sdk.PayToolCallback;
+import com.mandou.acp.sdk.ServiceExpireInfo;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +43,15 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
     EditText bizNo;
     EditText serviceNo;
     EditText goodsTitle;
+    TextView expireTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_pay);
+
+        expireTime = findViewById(R.id.expireTime);
 
         AcpClient.sharedInstance().initPayTools(new PayToolCallback() {
 
@@ -238,6 +246,36 @@ public class PayActivity extends BaseActivity implements ErrorHandler {
             @Override
             public void onSuccess(List<PayOrderInfo> list) {
 
+            }
+
+            @Override
+            public void onFail(String s, Throwable throwable) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String tokenStr = PreferenceHelper.getValue(TOKEN);
+        if (tokenStr == null || tokenStr.isEmpty()) {
+            expireTime.setText("Expire Time: " + "  Not Login");
+            return;
+        }
+
+        String customerIdentity = JSONObject.parseObject(tokenStr).getString("customerId");
+
+        AcpClient.sharedInstance().queryExpireTime(customerIdentity, "VIP", new ExpireTimeCallback(){
+            @Override
+            public void onSuccess(List<ServiceExpireInfo> list) {
+                if (!list.isEmpty()) {
+                    String str = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(list.get(0).getExpireTime());
+                    expireTime.setText("Expire Time: " + str);
+                } else {
+                    expireTime.setText("Expire Time: " + "  Not Purchased");
+                }
             }
 
             @Override

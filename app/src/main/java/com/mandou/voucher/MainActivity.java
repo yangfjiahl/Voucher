@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +53,8 @@ public class MainActivity extends BaseActivity {
     EditText serviceNo;
     EditText goodsTitle;
 
+    TextView expireTime;
+
     Button btnTap;
     Button btnSdkPay;
 
@@ -66,6 +71,7 @@ public class MainActivity extends BaseActivity {
         goodsTitle = findViewById(R.id.title);
         btnTap = findViewById(R.id.btn_tap);
         btnSdkPay = findViewById(R.id.btn_paysdk);
+        expireTime = findViewById(R.id.expireTime);
 
         btnTap.setOnClickListener(v -> reportTapEvent("btn_click"));
 
@@ -109,6 +115,8 @@ public class MainActivity extends BaseActivity {
 
     private static final int MSG_ALI_PAID = 4;
 
+    private static final int MSG_EXPIRE_TIME = 5;
+
     private Handler handler = new Handler() {
 
         @Override
@@ -127,6 +135,16 @@ public class MainActivity extends BaseActivity {
                     break;
                 case MSG_ALI_PAID:
                     startActivity(new Intent(MainActivity.this, PayResultActivity.class));
+                    break;
+                case MSG_EXPIRE_TIME:
+                    Long expireTimestamp = msg.getData().getLong("data");
+                    if (expireTimestamp == -1) {
+                        expireTime.setText("Expire Time: " + "Not Purchased");
+                    } else {
+                        String str = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(expireTimestamp));
+
+                        expireTime.setText("Expire Time: " + str);
+                    }
                     break;
             }
         }
@@ -375,6 +393,66 @@ public class MainActivity extends BaseActivity {
                     bundle.putSerializable("data", data);
                     msg.setData(bundle);
                     msg.what = MSG_CREATE_ORDER_RESP;
+                    handler.sendMessage(msg);
+                } else {
+                    Looper.prepare();
+                    Toast.makeText(MainActivity.this, result.getString("msg"), Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String tokenStr = PreferenceHelper.getValue(TOKEN);
+        if (tokenStr == null || tokenStr.isEmpty()) {
+            expireTime.setText("Expire Time: " + "  Not Login");
+            return;
+        }
+
+        String customerIdentity = JSONObject.parseObject(tokenStr).getString("customerId");
+
+        // 查询过期时间
+        Request request = new Request.Builder()
+                .url(String.format(Api.buildUrl(Api.EXPIRE_TIME), customerIdentity))
+                .headers(PayToolInfo.headers)
+                .build();
+
+        Log.d(TAG, request.headers().toString());
+
+        Call call = Api.getClient().newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Looper.prepare();
+                Toast.makeText(MainActivity.this, "请求服务端失败", Toast.LENGTH_LONG).show();
+                Looper.loop();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String s = response.body().string();
+                Log.d(TAG, "onResponse: " + s);
+
+                JSONObject result = JSON.parseObject(s);
+                String code = result.getString("code");
+
+                Long expireTimestamp = -1L;
+
+                if ("0".equals(code)) {
+                    JSONArray serviceList = result.getJSONObject("data").getJSONArray("customerServiceList");
+                    if (!serviceList.isEmpty()) {
+                        expireTimestamp = serviceList.getJSONObject(0).getLong("expireTime");
+                    }
+
+                    Message msg = new Message();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("data", expireTimestamp);
+                    msg.setData(bundle);
+                    msg.what = MSG_EXPIRE_TIME;
                     handler.sendMessage(msg);
                 } else {
                     Looper.prepare();
