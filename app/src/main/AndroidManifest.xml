@@ -44,7 +44,7 @@
         <activity android:name=".PayActivity"/>
 
         <meta-data
-            android:name="UMENG_CHANNEL"
+            android:name="ACS_CHANNEL"
             android:value="tencent" />
     </application>
 
