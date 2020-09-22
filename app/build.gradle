@@ -14,8 +14,8 @@ android {
         applicationId "com.mandou.voucher"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 18
-        versionName "1.8"
+        versionCode 19
+        versionName "1.9"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -57,7 +57,7 @@ dependencies {
 
 //    compile (name: 'acs-v20200831-production', ext: 'aar')
 //    compile (name: 'acp-v20200906-production', ext: 'aar')
-    compile (name: 'appinchina-sdk-v20200922-production', ext: 'aar')
+    compile (name: 'appinchina-sdk-v20200922-2-production', ext: 'aar')
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
