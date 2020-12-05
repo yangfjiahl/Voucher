@@ -2,11 +2,19 @@ package com.mandou.voucher;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.mandou.acp.sdk.AcpClient;
 import com.mandou.acp.sdk.AcpClientConfig;
 import com.mandou.acs.sdk.AcsClient;
@@ -26,126 +34,159 @@ import okhttp3.Response;
 
 public class VoucherApp extends Application {
 
-    private static String TAG;
+	private static String TAG;
 
-    private static final String TOKEN = "TOKEN";
+	private static final String TOKEN = "TOKEN";
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
-        TAG = getClass().getSimpleName();
+		TAG = getClass().getSimpleName();
 
-        PreferenceHelper.init(this);
-        SessionHelper.init(this);
+		PreferenceHelper.init(this);
+		SessionHelper.init(this);
 
-        // API: check whether token is expired or not
-        checkLogin();
+		// API: check whether token is expired or not
+		checkLogin();
 
-        // API:　Statistics　navigate pages
-//        ActionHelper.init(this);
-//        this.registerActivityLifecycleCallbacks(navigateAction());
+		// API: Statistics navigate pages
+		// ActionHelper.init(this);
+		// this.registerActivityLifecycleCallbacks(navigateAction());
 
-        // Statistics SDK:
-        AcsClient.sharedInstance().init(this, new AcsClientConfig("20190307001", "123"))
-                .setLoggingEnabled();
+		// Statistics SDK:
+		AcsClient.sharedInstance().init(this, new AcsClientConfig("20190307001", "123"))
+				.setLoggingEnabled();
 
-        AcpClient.sharedInstance().init(this, new AcpClientConfig("20190307001", "123"));
-    }
+		AcpClient.sharedInstance().init(this, new AcpClientConfig("20190307001", "123"));
 
-    private void checkLogin() {
-        String tokenStr = PreferenceHelper.getValue(TOKEN);
-        if (tokenStr != null && !tokenStr.isEmpty()) {
-            JSONObject json = JSONObject.parseObject(tokenStr);
-            String token = json.getString("token");
+		initAliyunPushChannel(this);
+	}
 
-            HttpUrl.Builder urlBuilder = HttpUrl.parse(Api.buildUrl(Api.CHECK_LOGIN))
-                    .newBuilder();
-            urlBuilder.addQueryParameter("token", token);
+	private void initAliyunPushChannel(Context applicationContext) {
+		PushServiceFactory.init(applicationContext);
+		CloudPushService pushService = PushServiceFactory.getCloudPushService();
+		pushService.register(applicationContext, new CommonCallback() {
+			@Override
+			public void onSuccess(String response) {
+				Log.d(TAG, "init cloudchannel success, deviceId=" + pushService.getDeviceId());
 
-            Request request = new Request.Builder()
-                    .url(urlBuilder.build())
-                    .headers(PayToolInfo.headers)
-                    .build();
-            Call call = Api.getClient().newCall(request);
-            call.enqueue(new Callback() {
+				// 添加标签
+				pushService.bindTag(CloudPushService.DEVICE_TARGET,
+						new String[] { "anonymous" }, null, new CommonCallback() {
+							@Override
+							public void onSuccess(String s) {
 
-                @Override
-                public void onFailure(Call call, IOException e) {
+							}
 
-                }
+							@Override
+							public void onFailed(String s, String s1) {
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String s = response.body().string();
+							}
+						});
+			}
 
-                    Log.d(TAG, "onResponse: " + s);
+			@Override
+			public void onFailed(String errorCode, String errorMessage) {
+				Log.d(TAG, "init cloudchannel failed -- errorcode:" + errorCode
+						+ " -- errorMessage:" + errorMessage);
+			}
+		});
+	}
 
-                    JSONObject result = JSON.parseObject(s);
+	private void checkLogin() {
+		String tokenStr = PreferenceHelper.getValue(TOKEN);
+		if (tokenStr != null && !tokenStr.isEmpty()) {
+			JSONObject json = JSONObject.parseObject(tokenStr);
+			String token = json.getString("token");
 
-                    if (!result.getBoolean("data")) {
-                        // token expired, delete it
-                        PreferenceHelper.remove(TOKEN);
-                    } else {
-                        SessionHelper.startSession();
-                    }
-                }
-            });
-        } else {
-            Log.d(TAG, "No credential");
-        }
-    }
+			HttpUrl.Builder urlBuilder = HttpUrl.parse(Api.buildUrl(Api.CHECK_LOGIN))
+					.newBuilder();
+			urlBuilder.addQueryParameter("token", token);
 
-    /**
-     * 页面跳转监听统计
-     */
-    private static Application.ActivityLifecycleCallbacks navigateAction() {
+			Request request = new Request.Builder().url(urlBuilder.build())
+					.headers(PayToolInfo.headers).build();
+			Call call = Api.getClient().newCall(request);
+			call.enqueue(new Callback() {
 
-        Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+				@Override
+				public void onFailure(Call call, IOException e) {
 
-            }
+				}
 
-            @Override
-            public void onActivityStarted(Activity activity) {
-            }
+				@Override
+				public void onResponse(Call call, Response response) throws IOException {
+					String s = response.body().string();
 
-            @Override
-            public void onActivityResumed(Activity activity) {
-                Log.v(TAG, activity.getClass().getName() + "onActivityResumed");
+					Log.d(TAG, "onResponse: " + s);
 
-                ActionModel actionModel = new ActionModel();
-                actionModel.setPageName(activity.getClass().getSimpleName());
+					JSONObject result = JSON.parseObject(s);
 
-                if (activity instanceof HasPayment) {
-                    actionModel.setPaymentPage(((HasPayment) activity).isPaymentPage());
-                }
+					if (!result.getBoolean("data")) {
+						// token expired, delete it
+						PreferenceHelper.remove(TOKEN);
+					}
+					else {
+						SessionHelper.startSession();
+					}
+				}
+			});
+		}
+		else {
+			Log.d(TAG, "No credential");
+		}
+	}
 
-                ActionHelper.reportAction(actionModel);
-            }
+	/**
+	 * 页面跳转监听统计
+	 */
+	private static Application.ActivityLifecycleCallbacks navigateAction() {
 
-            @Override
-            public void onActivityPaused(Activity activity) {
+		Application.ActivityLifecycleCallbacks activityLifecycleCallbacks = new Application.ActivityLifecycleCallbacks() {
+			@Override
+			public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
-            }
+			}
 
-            @Override
-            public void onActivityStopped(Activity activity) {
+			@Override
+			public void onActivityStarted(Activity activity) {
+			}
 
-            }
+			@Override
+			public void onActivityResumed(Activity activity) {
+				Log.v(TAG, activity.getClass().getName() + "onActivityResumed");
 
-            @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+				ActionModel actionModel = new ActionModel();
+				actionModel.setPageName(activity.getClass().getSimpleName());
 
-            }
+				if (activity instanceof HasPayment) {
+					actionModel.setPaymentPage(((HasPayment) activity).isPaymentPage());
+				}
 
-            @Override
-            public void onActivityDestroyed(Activity activity) {
+				ActionHelper.reportAction(actionModel);
+			}
 
-            }
-        };
+			@Override
+			public void onActivityPaused(Activity activity) {
 
-        return activityLifecycleCallbacks;
-    }
+			}
+
+			@Override
+			public void onActivityStopped(Activity activity) {
+
+			}
+
+			@Override
+			public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+			}
+
+			@Override
+			public void onActivityDestroyed(Activity activity) {
+
+			}
+		};
+
+		return activityLifecycleCallbacks;
+	}
 }

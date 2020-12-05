@@ -59,6 +59,11 @@ dependencies {
 //    compile (name: 'acp-v20200906-production', ext: 'aar')
     compile (name: 'appinchina-sdk-v20200922-4-production', ext: 'aar')
 
+    // aliyun push sdk
+    implementation ('com.aliyun.ams:alicloud-android-push:3.2.3') {
+        exclude(module:'alicloud-android-utdid')
+    }
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'

@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- aliyun push -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
         tools:ignore="ProtectedPermissions" />
@@ -43,9 +47,25 @@
 
         <activity android:name=".PayActivity"/>
 
+        <receiver android:name=".AliyunMessageReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_REMOVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.sdk.android.push.RECEIVE" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="ACS_CHANNEL"
             android:value="tencent" />
+
+        <meta-data android:name="com.alibaba.app.appkey" android:value="32105477"/>
+        <meta-data android:name="com.alibaba.app.appsecret" android:value="6bf4f0d7cc444361b0454da734f80b0c"/>
     </application>
 
 </manifest>
