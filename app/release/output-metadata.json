@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.mandou.voucher",
+  "variantName": "processReleaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 10401,
+      "versionName": "1.4.1",
+      "outputFile": "app_v1.4.1_2020-12-13_release.apk"
+    }
+  ]
+}
