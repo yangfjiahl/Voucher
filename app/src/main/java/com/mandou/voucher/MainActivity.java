@@ -379,6 +379,19 @@ public class MainActivity extends BaseActivity {
 					JSONObject.parseObject(tokenStr).getString("customerId"));
 		}
 
+		// 周期扣款
+		Map<String, Object> agreementPayParams = new HashMap<>();
+		agreementPayParams.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
+		agreementPayParams.put("scene", "INDUSTRY|MOBILE");
+		agreementPayParams.put("payChannel", "ALIPAY");
+		agreementPayParams.put("periodType", "DAY");
+		agreementPayParams.put("periodValue", 7);
+		agreementPayParams.put("nextExecDate", 1614297600000L);
+		agreementPayParams.put("serviceNo", "VIP");
+		agreementPayParams.put("periodAmount", 1);
+
+		params.put("agreement", agreementPayParams);
+
 		Request request = new Request.Builder().url(Api.buildUrl(Api.CREATE_ORDER))
 				.post(RequestBody.create(
 						MediaType.parse("application/json;charset=UTF-8"),
