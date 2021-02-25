@@ -200,7 +200,7 @@ public class MainActivity extends BaseActivity {
 		agreementPayParams.put("payChannel", "ALIPAY");
 		agreementPayParams.put("periodType", "DAY");
 		agreementPayParams.put("periodValue", 7);
-		agreementPayParams.put("nextExecDate", 1614297600000L);
+		agreementPayParams.put("nextExecDate", new Date().getTime() + 24*60*60*1000);
 		agreementPayParams.put("serviceNo", "VIP");
 		agreementPayParams.put("periodAmount", 1);
 
@@ -463,7 +463,7 @@ public class MainActivity extends BaseActivity {
 			agreementPayParams.put("payChannel", "ALIPAY");
 			agreementPayParams.put("periodType", "DAY");
 			agreementPayParams.put("periodValue", 7);
-			agreementPayParams.put("nextExecDate", 1614297600000L);
+			agreementPayParams.put("nextExecDate", new Date().getTime() + 24*60*60*1000);
 			agreementPayParams.put("serviceNo", "VIP");
 			agreementPayParams.put("periodAmount", 1);
 
