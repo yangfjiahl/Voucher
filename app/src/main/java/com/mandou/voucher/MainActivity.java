@@ -3,6 +3,7 @@ package com.mandou.voucher;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,11 +54,13 @@ public class MainActivity extends BaseActivity {
 	EditText bizNo;
 	EditText serviceNo;
 	EditText goodsTitle;
+	CheckBox agreement;
 
 	TextView expireTime;
 
 	Button btnTap;
 	Button btnSdkPay;
+	Button btnSign;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +73,18 @@ public class MainActivity extends BaseActivity {
 		bizNo = findViewById(R.id.bizNo);
 		serviceNo = findViewById(R.id.serviceNo);
 		goodsTitle = findViewById(R.id.title);
+		agreement = findViewById(R.id.agreement);
 		btnTap = findViewById(R.id.btn_tap);
 		btnSdkPay = findViewById(R.id.btn_paysdk);
 		expireTime = findViewById(R.id.expireTime);
+		btnSign = findViewById(R.id.sign_agreement);
 
 		btnTap.setOnClickListener(v -> reportTapEvent("btn_click"));
 
 		btnSdkPay.setOnClickListener(
 				v -> startActivity(new Intent(MainActivity.this, PayActivity.class)));
+
+		btnSign.setOnClickListener(v -> signAgreement());
 
 		TAG = getClass().getSimpleName();
 
@@ -167,6 +175,74 @@ public class MainActivity extends BaseActivity {
 		else {
 			callAlipay(data);
 		}
+	}
+
+	private void signAgreement() {
+		// check user login
+		String tokenStr = PreferenceHelper.getValue(TOKEN);
+		// ===========UNCOMMENT below lines, if you need authentication module=========
+		if (tokenStr == null || tokenStr.isEmpty()) {
+			Toast.makeText(MainActivity.this, "Please login before payment",
+					Toast.LENGTH_LONG).show();
+
+			try {
+				startActivity(new Intent(MainActivity.this, LoginActivity.class));
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+
+		Map<String, Object> agreementPayParams = new HashMap<>();
+		agreementPayParams.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
+		agreementPayParams.put("scene", "INDUSTRY|MOBILE");
+		agreementPayParams.put("payChannel", "ALIPAY");
+		agreementPayParams.put("periodType", "DAY");
+		agreementPayParams.put("periodValue", 7);
+		agreementPayParams.put("nextExecDate", 1614297600000L);
+		agreementPayParams.put("serviceNo", "VIP");
+		agreementPayParams.put("periodAmount", 1);
+
+		Request request = new Request.Builder().url(Api.buildUrl(Api.AGREEMENT_SIGN))
+				.post(RequestBody.create(
+						MediaType.parse("application/json;charset=UTF-8"),
+						JSONObject.toJSONString(agreementPayParams)))
+				.headers(PayToolInfo.headers).build();
+
+		Log.d(TAG, request.headers().toString());
+
+		Call call = Api.getClient().newCall(request);
+		call.enqueue(new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+				Looper.prepare();
+				Toast.makeText(MainActivity.this, "请求服务端失败", Toast.LENGTH_LONG).show();
+				Looper.loop();
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				String s = response.body().string();
+				Log.d(TAG, "onResponse: " + s);
+
+				JSONObject result = JSON.parseObject(s);
+
+				String code = result.getString("code");
+
+				if ("0".equals(code)) {
+					String orderInfo = "alipays://platformapi/startapp?appId=60000157&appClearTop=false&startMultApp=YES&sign_params=" + result.getJSONObject("data").getString("alipayStr");
+					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(orderInfo));
+					startActivity(intent);
+				}
+				else {
+					Looper.prepare();
+					Toast.makeText(MainActivity.this, result.getString("msg"),
+							Toast.LENGTH_LONG).show();
+					Looper.loop();
+				}
+			}
+		});
 	}
 
 	private void callAlipay(JSONObject data) {
@@ -380,17 +456,19 @@ public class MainActivity extends BaseActivity {
 		}
 
 		// 周期扣款
-		Map<String, Object> agreementPayParams = new HashMap<>();
-		agreementPayParams.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
-		agreementPayParams.put("scene", "INDUSTRY|MOBILE");
-		agreementPayParams.put("payChannel", "ALIPAY");
-		agreementPayParams.put("periodType", "DAY");
-		agreementPayParams.put("periodValue", 7);
-		agreementPayParams.put("nextExecDate", 1614297600000L);
-		agreementPayParams.put("serviceNo", "VIP");
-		agreementPayParams.put("periodAmount", 1);
+		if (agreement.isChecked()) {
+			Map<String, Object> agreementPayParams = new HashMap<>();
+			agreementPayParams.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
+			agreementPayParams.put("scene", "INDUSTRY|MOBILE");
+			agreementPayParams.put("payChannel", "ALIPAY");
+			agreementPayParams.put("periodType", "DAY");
+			agreementPayParams.put("periodValue", 7);
+			agreementPayParams.put("nextExecDate", 1614297600000L);
+			agreementPayParams.put("serviceNo", "VIP");
+			agreementPayParams.put("periodAmount", 1);
 
-		params.put("agreement", agreementPayParams);
+			params.put("agreement", agreementPayParams);
+		}
 
 		Request request = new Request.Builder().url(Api.buildUrl(Api.CREATE_ORDER))
 				.post(RequestBody.create(
