@@ -64,7 +64,7 @@ dependencies {
 
 //    compile (name: 'acs-v20200831-production', ext: 'aar')
 //    compile (name: 'acp-v20200906-production', ext: 'aar')
-    compile (name: 'appinchina-sdk-v20200922-4-production', ext: 'aar')
+    compile (name: 'appinchina-sdk-v20210226-production-v4', ext: 'aar')
 
     // aliyun push sdk
     implementation ('com.aliyun.ams:alicloud-android-push:3.2.3') {

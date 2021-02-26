@@ -39,6 +39,7 @@ public class AgreementActivity extends BaseActivity {
     Button query_agreement;
     Button sign_agreement;
     Button unsign_agreement;
+    Button sdk;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,10 +50,12 @@ public class AgreementActivity extends BaseActivity {
         query_agreement = findViewById(R.id.query_agreement);
         sign_agreement = findViewById(R.id.sign_agreement);
         unsign_agreement = findViewById(R.id.unsign_agreement);
+        sdk = findViewById(R.id.sdk);
 
         query_agreement.setOnClickListener(v -> queryAgreement());
         sign_agreement.setOnClickListener(v -> signAgreement());
         unsign_agreement.setOnClickListener(v -> unsignAgreement());
+        sdk.setOnClickListener(v->startActivity(new Intent(this, AgreementSdkActivity.class)));
     }
 
     private static final int MSG_QUERY = 1;
@@ -207,15 +210,9 @@ public class AgreementActivity extends BaseActivity {
                 String code = result.getString("code");
 
                 if ("0".equals(code)) {
-                    JSONObject data = result.getJSONObject("data");
-
-                    Message msg = new Message();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("data", "agreementStatus=" + data.getString("agreementStatus") + "\n" +
-                            "nextExecDate=" + new Date(data.getLong("lastExecDate")).toLocaleString());
-                    msg.setData(bundle);
-                    msg.what = MSG_SIGN;
-                    handler.sendMessage(msg);
+                    String orderInfo = "alipays://platformapi/startapp?appId=60000157&appClearTop=false&startMultApp=YES&sign_params=" + result.getJSONObject("data").getString("alipayStr");
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(orderInfo));
+                    startActivity(intent);
                 }
                 else {
                     Looper.prepare();

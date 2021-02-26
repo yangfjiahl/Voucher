@@ -49,6 +49,8 @@
 
         <activity android:name=".AgreementActivity"/>
 
+        <activity android:name=".AgreementSdkActivity"/>
+
         <receiver android:name=".AliyunMessageReceiver"
             android:exported="false">
             <intent-filter>
