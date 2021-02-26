@@ -22,6 +22,10 @@ public class Api {
 
     public static final String AGREEMENT_SIGN = "/agreementSign.json";
 
+    public static final String AGREEMENT_UNSIGN = "/agreementUnsign.json";
+
+    public static final String AGREEMENT_QUERY = "/agreementQuery.json";
+
     public static final String SMS = "/sms.json";
 
     public static final String LOGIN = "/auth.json";

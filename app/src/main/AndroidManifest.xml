@@ -47,6 +47,8 @@
 
         <activity android:name=".PayActivity"/>
 
+        <activity android:name=".AgreementActivity"/>
+
         <receiver android:name=".AliyunMessageReceiver"
             android:exported="false">
             <intent-filter>

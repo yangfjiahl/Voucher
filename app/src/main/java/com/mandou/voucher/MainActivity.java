@@ -84,7 +84,8 @@ public class MainActivity extends BaseActivity {
 		btnSdkPay.setOnClickListener(
 				v -> startActivity(new Intent(MainActivity.this, PayActivity.class)));
 
-		btnSign.setOnClickListener(v -> signAgreement());
+		btnSign.setOnClickListener(
+				v -> startActivity(new Intent(MainActivity.this, AgreementActivity.class)));
 
 		TAG = getClass().getSimpleName();
 
@@ -175,74 +176,6 @@ public class MainActivity extends BaseActivity {
 		else {
 			callAlipay(data);
 		}
-	}
-
-	private void signAgreement() {
-		// check user login
-		String tokenStr = PreferenceHelper.getValue(TOKEN);
-		// ===========UNCOMMENT below lines, if you need authentication module=========
-		if (tokenStr == null || tokenStr.isEmpty()) {
-			Toast.makeText(MainActivity.this, "Please login before payment",
-					Toast.LENGTH_LONG).show();
-
-			try {
-				startActivity(new Intent(MainActivity.this, LoginActivity.class));
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			return;
-		}
-
-		Map<String, Object> agreementPayParams = new HashMap<>();
-		agreementPayParams.put("customerIdentity", JSONObject.parseObject(tokenStr).getString("customerId"));
-		agreementPayParams.put("scene", "INDUSTRY|MOBILE");
-		agreementPayParams.put("payChannel", "ALIPAY");
-		agreementPayParams.put("periodType", "DAY");
-		agreementPayParams.put("periodValue", 7);
-		agreementPayParams.put("nextExecDate", new Date().getTime() + 24*60*60*1000);
-		agreementPayParams.put("serviceNo", "VIP");
-		agreementPayParams.put("periodAmount", 1);
-
-		Request request = new Request.Builder().url(Api.buildUrl(Api.AGREEMENT_SIGN))
-				.post(RequestBody.create(
-						MediaType.parse("application/json;charset=UTF-8"),
-						JSONObject.toJSONString(agreementPayParams)))
-				.headers(PayToolInfo.headers).build();
-
-		Log.d(TAG, request.headers().toString());
-
-		Call call = Api.getClient().newCall(request);
-		call.enqueue(new Callback() {
-			@Override
-			public void onFailure(Call call, IOException e) {
-				Looper.prepare();
-				Toast.makeText(MainActivity.this, "请求服务端失败", Toast.LENGTH_LONG).show();
-				Looper.loop();
-			}
-
-			@Override
-			public void onResponse(Call call, Response response) throws IOException {
-				String s = response.body().string();
-				Log.d(TAG, "onResponse: " + s);
-
-				JSONObject result = JSON.parseObject(s);
-
-				String code = result.getString("code");
-
-				if ("0".equals(code)) {
-					String orderInfo = "alipays://platformapi/startapp?appId=60000157&appClearTop=false&startMultApp=YES&sign_params=" + result.getJSONObject("data").getString("alipayStr");
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(orderInfo));
-					startActivity(intent);
-				}
-				else {
-					Looper.prepare();
-					Toast.makeText(MainActivity.this, result.getString("msg"),
-							Toast.LENGTH_LONG).show();
-					Looper.loop();
-				}
-			}
-		});
 	}
 
 	private void callAlipay(JSONObject data) {
